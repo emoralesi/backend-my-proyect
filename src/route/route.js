@@ -1,8 +1,9 @@
 import express from 'express'
 import { responseTypeRoute } from '../response/responseTypeRoute.js'
-import { agregarCategoriaService, buscarCategoriasService } from '../service/categoriaService.js'
-import { AregarCategoriaAndFiltroService, buscarFiltroCategoriaService } from '../service/filtroCategoriaService.js'
-import { actualizarEstadoService, actualizarProductoService, agregarProductoService, obtenerProductoService } from '../service/productosService.js'
+import { agregarCategoriaService, buscarCategoriasService, buscarTodoCategoriasService } from '../service/categoriaService.js'
+import { AregarCategoriaAndFiltroService, buscarFiltroCategoriaBySubSubCategoriaService, buscarFiltroCategoriaService } from '../service/filtroCategoriaService.js'
+import { obtenerMenuService } from '../service/menuService.js'
+import { actualizarEstadoService, actualizarProductoService, agregarProductoService, agregarStockService, obtenerProductoService } from '../service/productosService.js'
 import { buscarSubCategoriasService } from '../service/subCategoriaService.js'
 import { buscarSubSubCategoriasService } from '../service/subSubCategoriaService.js'
 import { buscarTipoFiltroCategoriaService } from '../service/tipoFiltroCategoriaService.js'
@@ -15,6 +16,16 @@ app.use('/service', router)
 router.get('/obtenerCategoria', async (req, res) => {
 
     const resultado = await buscarCategoriasService();
+
+    console.log("Este es mi resultado route", resultado);
+
+    responseTypeRoute(resultado, res)
+
+})
+
+router.get('/obtenerTodoCategorias', async (req, res) => {
+
+    const resultado = await buscarTodoCategoriasService();
 
     console.log("Este es mi resultado route", resultado);
 
@@ -72,6 +83,14 @@ router.get('/obtenerFiltroCategoria', async (req, res) => {
 
 })
 
+router.post('/obtenerFiltroCategoriaBySubSubCategoria', async (req, res) => {
+
+    const resultado = await buscarFiltroCategoriaBySubSubCategoriaService(req);
+
+    responseTypeRoute(resultado, res)
+
+})
+
 router.post('/AgregarCategoriaYFiltro', async (req, res) => {
 
     const resultado = await AregarCategoriaAndFiltroService(req.body);
@@ -85,6 +104,14 @@ router.post('/agregarProducto', async (req, res) => {
     console.log("Este es mi req", req.body);
 
     const resultado = await agregarProductoService(req.body);
+
+    responseTypeRoute(resultado, res)
+})
+
+router.post('/agregarStock', async (req, res) => {
+    console.log("Este es mi req", req.body);
+
+    const resultado = await agregarStockService(req.body);
 
     responseTypeRoute(resultado, res)
 })
@@ -107,6 +134,17 @@ router.post('/actualizarProducto', async (req, res) => {
     const resultado = await actualizarProductoService(req.body);
 
     responseTypeRoute(resultado, res)
+})
+
+// MENU
+
+router.get('/obtenerMenuItems', async (req, res) => {
+
+    const resultado = await obtenerMenuService();
+
+    console.log("mi resultado",resultado);
+    responseTypeRoute(resultado, res)
+
 })
 
 export default app

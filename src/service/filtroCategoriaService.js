@@ -1,5 +1,5 @@
 import { agregarCategoria } from "../dao/categoriaDAO.js";
-import { buscarFiltroCategoria, AgrgarFiltroCategoria } from "../dao/filtroCategoriaDAO.js";
+import { buscarFiltroCategoria, AgrgarFiltroCategoria, buscarFiltroCategoriaBySubSubCategoria } from "../dao/filtroCategoriaDAO.js";
 import { AgregarRelSubCategoriaFiltro } from "../dao/relSubCategoriaFiltroDAO.js";
 import { agregarSubCategoria } from "../dao/subCategoriaDAO.js";
 import { agregarSubSubCategoria } from "../dao/subSubCategoriaDAO.js";
@@ -32,11 +32,11 @@ export const AregarCategoriaAndFiltroService = async (body) => {
 
     const conexion = await getClient(); // Se obtiene una nueva instancia del cliente
 
-    var idCategoria;
-    var idSubCategoria;
-    var idSubSubCategoria;
+    let idCategoria;
+    let idSubCategoria;
+    let idSubSubCategoria;
 
-    var idFiltroCategoria;
+    let idFiltroCategoria;
 
     try {
 
@@ -109,4 +109,29 @@ export const AregarCategoriaAndFiltroService = async (body) => {
     }
 }
 
-export default { buscarFiltroCategoriaService, AregarCategoriaAndFiltroService }
+export const buscarFiltroCategoriaBySubSubCategoriaService = async (body) => {
+
+    const conexion = await getClient(); // Se obtiene una nueva instancia del cliente
+
+    try {
+
+        console.log("entre al service");
+
+        await conectar(conexion);
+
+        console.log(body.body);
+        const resultado = await buscarFiltroCategoriaBySubSubCategoria(conexion,body.body.idSubSubCategoria);
+
+        return responseTypeService(resultado)
+
+    } catch (error) {
+
+        return responseTypeServiceError(error)
+
+    } finally {
+
+        await desconectar(conexion);
+    }
+}
+
+export default { buscarFiltroCategoriaService, AregarCategoriaAndFiltroService, buscarFiltroCategoriaBySubSubCategoriaService }

@@ -16,6 +16,24 @@ export const buscarCategorias = async (conexion) => {
     }
 }
 
+export const buscarTodoCategorias = async (conexion) => {
+
+    try {
+        const sql = `select * from categoria c
+        inner join sub_categoria sc2 on (c.id_categoria = sc2.id_categoria)
+        inner join sub_sub_categoria ssc on (sc2.id_sub_categoria = ssc.id_sub_categoria)`;
+
+        let results = await conexion.query(sql);
+
+        return responseTypeDAO(results)
+
+    } catch (error) {
+
+        console.log(error);
+        throw error
+    }
+}
+
 export const agregarCategoria = async (conexion, nombre) => {
 
     try {
@@ -27,7 +45,7 @@ export const agregarCategoria = async (conexion, nombre) => {
 
         let results = await conexion.query(sql)
 
-        console.log("mi resultado de categoria",results);
+        console.log("mi resultado de categoria", results);
         return responseTypeDAO(results)
 
     } catch (error) {

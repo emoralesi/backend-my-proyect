@@ -3,7 +3,7 @@ import { responseTypeDAO } from "../response/responseTypeDAO.js";
 export const buscarProductos = async (conexion) => {
 
     try {
-        const sql = `select p.id_producto, c.nombre as nombreCategoria, sc.nombre_sub_categoria  as nombreSubCategoria , ssc.nombre_sub_sub_categoria as nombreSubSubCategoria , p.nombre, p.precio , p.sku , p.isactive  
+        const sql = `select p.id_producto, c.nombre as nombreCategoria, sc.nombre_sub_categoria  as nombreSubCategoria , ssc.nombre_sub_sub_categoria as nombreSubSubCategoria , p.nombre, p.precio , p.sku , p.isactive, p.stock  
                         from producto p
                         inner join rel_producto_categoria_filtro rp on (p.id_producto  = rp.id_producto )
                         inner join rel_sub_categoria_filtro  rs on (rs.id_rel_sub_categoria_filtro = rp.id_rel_sub_categoria_filtro)
@@ -28,8 +28,8 @@ export const agregarProducto = async (conexion, req) => {
     try {
 
         const sql = {
-            text: 'INSERT INTO producto (nombre,precio,sku,isactive) VALUES ($1,$2,$3,$4,$5)',
-            values: [req.nombre, req.precio, req.sku, true],
+            text: 'INSERT INTO producto (nombre,precio,sku,isactive,stock) VALUES ($1,$2,$3,$4,$5) returning *',
+            values: [req.nombre, req.precio, req.sku, true, req.stock],
         }
 
         const results = await conexion.query(sql)
@@ -81,4 +81,23 @@ export const actualizarProducto = async (conexion, req) => {
     }
 }
 
-export default { buscarProductos, agregarProducto, actualizarEstado, actualizarProducto }
+export const agregarStock = async (conexion, req) => {
+
+    try {
+
+        const sql = {
+            text: 'update producto set stock = (stock + ($1)) where sku = $2 returning id_producto,nombre,precio,sku,stock',
+            values: [req.stock, req.sku],
+        }
+
+        const results = await conexion.query(sql)
+
+        return responseTypeDAO(results)
+    } catch (error) {
+
+        console.log(error);
+        throw error
+    }
+}
+
+export default { buscarProductos, agregarProducto, actualizarEstado, actualizarProducto, agregarStock }

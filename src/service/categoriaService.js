@@ -1,4 +1,4 @@
-import { agregarCategoria, buscarCategorias } from "../dao/categoriaDAO.js";
+import { agregarCategoria, buscarCategorias, buscarTodoCategorias } from "../dao/categoriaDAO.js";
 import { conectar, desconectar, getClient } from '../db/ConnexionBD.js';
 import { responseTypeService, responseTypeServiceError } from "../response/responseTypeService.js";
 
@@ -11,6 +11,29 @@ export const buscarCategoriasService = async () => {
         await conectar(conexion);
 
         const resultado = await buscarCategorias(conexion);
+
+        return responseTypeService(resultado)
+
+    } catch (error) {
+
+        return responseTypeServiceError(error)
+
+    } finally {
+
+        await desconectar(conexion);
+    }
+
+}
+
+export const buscarTodoCategoriasService = async () => {
+
+    const conexion = await getClient(); // Se obtiene una nueva instancia del cliente
+
+    try {
+
+        await conectar(conexion);
+
+        const resultado = await buscarTodoCategorias(conexion);
 
         return responseTypeService(resultado)
 
@@ -47,4 +70,4 @@ export const agregarCategoriaService = async (req) => {
 
 }
 
-export default { buscarCategoriasService, agregarCategoriaService }
+export default { buscarCategoriasService, agregarCategoriaService,buscarTodoCategoriasService }
