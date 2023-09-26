@@ -9,13 +9,3 @@ export const responseTypeDAO = async (data) =>{
 
     return result
 }
-
-export const responseTypeDAOError = async (data) =>{
-
-    let result = {
-        "status": "error",
-        "code": data.code
-    }
-
-    return result
-}

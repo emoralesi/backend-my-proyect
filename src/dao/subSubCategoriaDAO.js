@@ -1,4 +1,4 @@
-import { responseTypeDAO, responseTypeDAOError } from "../response/responseTypeDAO.js";
+import { responseTypeDAO } from "../response/responseTypeDAO.js";
 
 export const buscarSubSubCategorias = async (conexion, req) => {
 

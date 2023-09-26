@@ -2,7 +2,7 @@ import { buscarMenu } from "../dao/menuDAO.js";
 import { conectar, desconectar, getClient } from "../db/ConnexionBD.js";
 import { responseTypeService, responseTypeServiceError } from "../response/responseTypeService.js";
 
-export const obtenerMenuService = async () => {
+export const obtenerMenuService = async (req) => {
 
     const conexion = await getClient(); // Se obtiene una nueva instancia del cliente
 
@@ -10,7 +10,7 @@ export const obtenerMenuService = async () => {
 
         await conectar(conexion)
 
-        const resultado = await buscarMenu(conexion);
+        const resultado = await buscarMenu(conexion,req);
 
         const transformedData = [];
 
@@ -21,7 +21,8 @@ export const obtenerMenuService = async () => {
                 existingMenu.subMenu.push({
                     id_sub_menu: item.id_sub_menu,
                     nombre_sub_menu: item.nombre_sub_menu,
-                    link_sub_menu: item.link_sub_menu
+                    link_sub_menu: item.link_sub_menu,
+                    idRoles: [item.id_roles]
                 });
             } else {
                 transformedData.push({
@@ -31,7 +32,8 @@ export const obtenerMenuService = async () => {
                         {
                             id_sub_menu: item.id_sub_menu,
                             nombre_sub_menu: item.nombre_sub_menu,
-                            link_sub_menu: item.link_sub_menu
+                            link_sub_menu: item.link_sub_menu,
+                            idRoles: [item.id_roles]
                         }
                     ]
                 });
