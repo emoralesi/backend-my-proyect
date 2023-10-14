@@ -9,7 +9,9 @@ import { actualizarEstadoService, actualizarProductoService, agregarProductoServ
 import { buscarSubCategoriasService } from '../service/subCategoriaService.js';
 import { buscarSubSubCategoriasService } from '../service/subSubCategoriaService.js';
 import { buscarTipoFiltroCategoriaService } from '../service/tipoFiltroCategoriaService.js';
-import { loginUsuarioService, registrarUsuarioService } from '../service/usuarioService.js';
+import { actualizarUsuarioEstadoService, loginUsuarioService, obtenerUsuariosService, registrarUsuarioService } from '../service/usuarioService.js';
+import { authenticateToken } from './middleware.js';
+import rolesService, { buscarRolesService } from '../service/rolesService.js';
 
 const app = express()
 const router = express.Router()
@@ -25,11 +27,10 @@ router.post('/registerUser', async (req, res) => {
     try {
 
         const result = await registrarUsuarioService(req.body, res);
-        console.log(result);
         if (result.status == 'error') {
-            res.status(400).json(result);
-        } else {
             res.status(201).json(result);
+        } else {
+            res.status(200).json(result);
         }
 
     } catch (error) {
@@ -41,7 +42,6 @@ router.post('/registerUser', async (req, res) => {
 
 router.post('/loginUser', async (req, res) => {
 
-    console.log("mi req route",req.body);
     try {
         const user = await loginUsuarioService(req.body, res);
 
@@ -57,7 +57,7 @@ router.post('/loginUser', async (req, res) => {
         // Generar un token JWT
         const token = jwt.sign({ userId: user.Resultado[0].id_usuario }, secretKey, { expiresIn: '1h' });
 
-        res.status(200).json({status:'ok',"id_usuario": user.Resultado[0].id_usuario,"nombreUsuario":user.Resultado[0].nombre_usuario,"idRole":user.Resultado[0].id_roles, "token": token });
+        res.status(200).json({ status: 'ok', "id_usuario": user.Resultado[0].id_usuario, "nombreUsuario": user.Resultado[0].nombre_usuario, "idRole": user.Resultado[0].id_roles, "token": token });
 
     } catch (error) {
         console.error('Error en el inicio de sesión:', error);
@@ -66,12 +66,25 @@ router.post('/loginUser', async (req, res) => {
 
 })
 
+router.get('/obtenerUsuarios', async (req, res) => {
+
+    const resultado = await obtenerUsuariosService();
+
+    responseTypeRoute(resultado, res)
+
+})
+
+router.post('/actualizarUsuarioEstado', authenticateToken, async (req, res) => {
+    const resultado = await actualizarUsuarioEstadoService(req.body);
+
+    responseTypeRoute(resultado, res)
+})
+
+
 // CATEGORIA
 router.get('/obtenerCategoria', async (req, res) => {
 
     const resultado = await buscarCategoriasService();
-
-    console.log("Este es mi resultado route", resultado);
 
     responseTypeRoute(resultado, res)
 
@@ -80,8 +93,6 @@ router.get('/obtenerCategoria', async (req, res) => {
 router.get('/obtenerTodoCategorias', async (req, res) => {
 
     const resultado = await buscarTodoCategoriasService();
-
-    console.log("Este es mi resultado route", resultado);
 
     responseTypeRoute(resultado, res)
 
@@ -92,8 +103,6 @@ router.get('/obtenerTipoFiltroCategoria', async (req, res) => {
 
     const resultado = await buscarTipoFiltroCategoriaService();
 
-    console.log("Este es mi resultado route", resultado);
-
     responseTypeRoute(resultado, res)
 
 })
@@ -101,8 +110,6 @@ router.get('/obtenerTipoFiltroCategoria', async (req, res) => {
 router.post('/agregarCategoria', async (req, res) => {
 
     const resultado = await agregarCategoriaService(req.body);
-
-    console.log(resultado);
 
     responseTypeRoute(resultado, res)
 })
@@ -155,7 +162,6 @@ router.post('/AgregarCategoriaYFiltro', async (req, res) => {
 // PRODUCTO
 
 router.post('/agregarProducto', async (req, res) => {
-    console.log("Este es mi req", req.body);
 
     const resultado = await agregarProductoService(req.body);
 
@@ -163,14 +169,13 @@ router.post('/agregarProducto', async (req, res) => {
 })
 
 router.post('/agregarStock', async (req, res) => {
-    console.log("Este es mi req", req.body);
 
     const resultado = await agregarStockService(req.body);
 
     responseTypeRoute(resultado, res)
 })
 
-router.get('/obtenerProducto', async (req, res) => {
+router.get('/obtenerProducto', authenticateToken, async (req, res) => {
 
     const resultado = await obtenerProductoService();
 
@@ -192,13 +197,21 @@ router.post('/actualizarProducto', async (req, res) => {
 
 // MENU
 
-router.get('/obtenerMenuItems', async (req, res) => {
+router.post('/obtenerMenuItems', async (req, res) => {
 
-    const resultado = await obtenerMenuService();
+    const resultado = await obtenerMenuService(req.body);
 
-    console.log("mi resultado", resultado);
     responseTypeRoute(resultado, res)
 
+})
+
+// ROLES
+
+router.get('/obtenerRoles', async (req, res) => {
+
+    const resultado = await buscarRolesService();
+
+    responseTypeRoute(resultado, res)
 })
 
 export default app

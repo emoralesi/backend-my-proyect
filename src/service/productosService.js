@@ -15,7 +15,6 @@ export const agregarProductoService = async (req) => {
 
         const resultado = await agregarProducto(conexion, req);
 
-        console.log(resultado);
         id_producto = resultado.rows[0].id_producto
 
         for (const iterator of req.listaFiltros) {

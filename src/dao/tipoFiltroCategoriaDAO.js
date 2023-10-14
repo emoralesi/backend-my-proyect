@@ -7,8 +7,6 @@ export const buscarTipoFiltroCategoria = async (conexion) => {
 
         let results = await conexion.query(sql);
 
-        console.log("mi result DAO",results);
-
         return responseTypeDAO(results)
 
     } catch (error) {

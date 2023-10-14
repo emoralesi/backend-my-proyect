@@ -37,7 +37,6 @@ export const AgrgarFiltroCategoria = async (conexion, data) => {
 
 export const buscarFiltroCategoriaBySubSubCategoria = async (conexion, id_sub_sub_categoria) => {
 
-    console.log(id_sub_sub_categoria);
     try {
 
         const sql = `select * from filtro_categoria fc 

@@ -1,6 +1,5 @@
 export const responseTypeRoute = async (resultado, res) => {
 
-    console.log("entro ??");
     if (resultado.status == 'ok') {
         if (resultado.command == 'SELECT') {
             if (resultado.Cantidad > 0) {

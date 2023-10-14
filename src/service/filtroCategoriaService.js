@@ -56,7 +56,7 @@ export const AregarCategoriaAndFiltroService = async (body) => {
         }
 
         if ((body.isNewSC) && !(body.isNewC)) {
-            console.log("DEBERIA ENTRAR ACA");
+
             const result = await agregarSubCategoria(conexion, body.nombreSubCategoria, body.categoria)
             idSubCategoria = result.rows[0].id_sub_categoria
 
@@ -65,7 +65,7 @@ export const AregarCategoriaAndFiltroService = async (body) => {
         }
 
         if (!body.isNewSC) {
-            console.log("NO DEBERIA ENTRAR ACA");
+
             const result = await agregarSubSubCategoria(conexion, body.nombreSubSubCategoria, body.subCategoria)
             idSubSubCategoria = result.rows[0].id_sub_sub_categoria
         }
@@ -114,8 +114,6 @@ export const buscarFiltroCategoriaBySubSubCategoriaService = async (body) => {
     const conexion = await getClient(); // Se obtiene una nueva instancia del cliente
 
     try {
-
-        console.log("entre al service");
 
         await conectar(conexion);
 

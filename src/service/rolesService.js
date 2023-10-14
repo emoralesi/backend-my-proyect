@@ -25,4 +25,4 @@ export const buscarRolesService = async () => {
 
 }
 
-export default {buscarRolesService}
+export default { buscarRolesService }

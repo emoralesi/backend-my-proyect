@@ -11,7 +11,6 @@ export const buscarTipoFiltroCategoriaService = async () => {
         await conectar(conexion);
 
         const resultado = await buscarTipoFiltroCategoria(conexion);
-        console.log("est es mi resultado Service",resultado);
 
         return responseTypeService(resultado)
 
