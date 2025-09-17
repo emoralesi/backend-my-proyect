@@ -9,17 +9,18 @@ import { actualizarEstadoService, actualizarProductoService, agregarProductoServ
 import { buscarSubCategoriasService } from '../service/subCategoriaService.js';
 import { buscarSubSubCategoriasService } from '../service/subSubCategoriaService.js';
 import { buscarTipoFiltroCategoriaService } from '../service/tipoFiltroCategoriaService.js';
-import { actualizarUsuarioEstadoService, loginUsuarioService, obtenerUsuariosService, registrarUsuarioService } from '../service/usuarioService.js';
+import { actualizarPasswordUsuarioService, actualizarUsuarioEstadoService, actualizarUsuarioService, loginUsuarioService, obtenerUsuariosService, registrarUsuarioService } from '../service/usuarioService.js';
 import { authenticateToken } from './middleware.js';
-import rolesService, { buscarRolesService } from '../service/rolesService.js';
+import { actualizarRolService, crearRolService, obtenerRolesConMenusService, obtenerRolesService } from '../service/rolesService.js';
+import { buscarsubMenuByIdRole } from '../dao/relMenuSubMenuDAO.js';
+import { buscatSubMenyByIdRoleService } from '../service/relMenuSubMenuService.js';
 
 const app = express()
 const router = express.Router()
 app.use('/service', router)
 
-// USUARIO
 
-const secretKey = 'tu_clave_secreta_jwt'; // Cambia esta clave secreta por una única y segura
+const secretKey = 'tu_clave_secreta_jwt';
 
 
 router.post('/registerUser', async (req, res) => {
@@ -54,10 +55,15 @@ router.post('/loginUser', async (req, res) => {
             console.log("contraseña invalida");
             return res.status(401).json({ status: 'error', error: 'Credenciales inválidas' });
         }
+
+        const accesSubMenu = await buscatSubMenyByIdRoleService({ id_roles: user.Resultado[0].id_roles })
+        let ids = accesSubMenu.Resultado.map(item => item.id_sub_menu);
+
+
         // Generar un token JWT
         const token = jwt.sign({ userId: user.Resultado[0].id_usuario }, secretKey, { expiresIn: '1h' });
 
-        res.status(200).json({ status: 'ok', "id_usuario": user.Resultado[0].id_usuario, "nombreUsuario": user.Resultado[0].nombre_usuario, "idRole": user.Resultado[0].id_roles, "token": token });
+        res.status(200).json({ status: 'ok', "id_usuario": user.Resultado[0].id_usuario, "nombreUsuario": user.Resultado[0].nombre_usuario, "idRole": user.Resultado[0].id_roles, "accesSubMenu": ids, "token": token });
 
     } catch (error) {
         console.error('Error en el inicio de sesión:', error);
@@ -66,7 +72,7 @@ router.post('/loginUser', async (req, res) => {
 
 })
 
-router.get('/obtenerUsuarios', async (req, res) => {
+router.get('/obtenerUsuarios', authenticateToken, async (req, res) => {
 
     const resultado = await obtenerUsuariosService();
 
@@ -80,9 +86,20 @@ router.post('/actualizarUsuarioEstado', authenticateToken, async (req, res) => {
     responseTypeRoute(resultado, res)
 })
 
+router.post('/actualizarUsuario', authenticateToken, async (req, res) => {
+    const resultado = await actualizarUsuarioService(req.body);
+
+    responseTypeRoute(resultado, res)
+})
+
+router.post('/actualizarPasswordUsuario', authenticateToken, async (req, res) => {
+    const resultado = await actualizarPasswordUsuarioService(req.body);
+
+    responseTypeRoute(resultado, res)
+})
 
 // CATEGORIA
-router.get('/obtenerCategoria', async (req, res) => {
+router.get('/obtenerCategoria', authenticateToken, async (req, res) => {
 
     const resultado = await buscarCategoriasService();
 
@@ -90,7 +107,7 @@ router.get('/obtenerCategoria', async (req, res) => {
 
 })
 
-router.get('/obtenerTodoCategorias', async (req, res) => {
+router.get('/obtenerTodoCategorias', authenticateToken, async (req, res) => {
 
     const resultado = await buscarTodoCategoriasService();
 
@@ -99,7 +116,7 @@ router.get('/obtenerTodoCategorias', async (req, res) => {
 })
 
 // CATEGORIA
-router.get('/obtenerTipoFiltroCategoria', async (req, res) => {
+router.get('/obtenerTipoFiltroCategoria', authenticateToken, async (req, res) => {
 
     const resultado = await buscarTipoFiltroCategoriaService();
 
@@ -107,7 +124,7 @@ router.get('/obtenerTipoFiltroCategoria', async (req, res) => {
 
 })
 
-router.post('/agregarCategoria', async (req, res) => {
+router.post('/agregarCategoria', authenticateToken, async (req, res) => {
 
     const resultado = await agregarCategoriaService(req.body);
 
@@ -116,7 +133,7 @@ router.post('/agregarCategoria', async (req, res) => {
 
 // SUB CATEGORIA
 
-router.post('/obtenerSubCategoria', async (req, res) => {
+router.post('/obtenerSubCategoria', authenticateToken, async (req, res) => {
 
     const resultado = await buscarSubCategoriasService(req);
 
@@ -126,7 +143,7 @@ router.post('/obtenerSubCategoria', async (req, res) => {
 
 // SUB SUB CATEGORIA
 
-router.post('/obtenerSubSubCategoria', async (req, res) => {
+router.post('/obtenerSubSubCategoria', authenticateToken, async (req, res) => {
 
     const resultado = await buscarSubSubCategoriasService(req);
 
@@ -136,7 +153,7 @@ router.post('/obtenerSubSubCategoria', async (req, res) => {
 
 // FILTRO CATEGORIA
 
-router.get('/obtenerFiltroCategoria', async (req, res) => {
+router.get('/obtenerFiltroCategoria', authenticateToken, async (req, res) => {
 
     const resultado = await buscarFiltroCategoriaService();
 
@@ -144,7 +161,7 @@ router.get('/obtenerFiltroCategoria', async (req, res) => {
 
 })
 
-router.post('/obtenerFiltroCategoriaBySubSubCategoria', async (req, res) => {
+router.post('/obtenerFiltroCategoriaBySubSubCategoria', authenticateToken, async (req, res) => {
 
     const resultado = await buscarFiltroCategoriaBySubSubCategoriaService(req);
 
@@ -152,7 +169,7 @@ router.post('/obtenerFiltroCategoriaBySubSubCategoria', async (req, res) => {
 
 })
 
-router.post('/AgregarCategoriaYFiltro', async (req, res) => {
+router.post('/AgregarCategoriaYFiltro', authenticateToken, async (req, res) => {
 
     const resultado = await AregarCategoriaAndFiltroService(req.body);
 
@@ -161,14 +178,14 @@ router.post('/AgregarCategoriaYFiltro', async (req, res) => {
 
 // PRODUCTO
 
-router.post('/agregarProducto', async (req, res) => {
+router.post('/agregarProducto', authenticateToken, async (req, res) => {
 
     const resultado = await agregarProductoService(req.body);
 
     responseTypeRoute(resultado, res)
 })
 
-router.post('/agregarStock', async (req, res) => {
+router.post('/agregarStock', authenticateToken, async (req, res) => {
 
     const resultado = await agregarStockService(req.body);
 
@@ -189,7 +206,7 @@ router.post('/actualizarEstado', async (req, res) => {
     responseTypeRoute(resultado, res)
 })
 
-router.post('/actualizarProducto', async (req, res) => {
+router.post('/actualizarProducto', authenticateToken, async (req, res) => {
     const resultado = await actualizarProductoService(req.body);
 
     responseTypeRoute(resultado, res)
@@ -197,7 +214,7 @@ router.post('/actualizarProducto', async (req, res) => {
 
 // MENU
 
-router.post('/obtenerMenuItems', async (req, res) => {
+router.post('/obtenerMenuItems', authenticateToken, async (req, res) => {
 
     const resultado = await obtenerMenuService(req.body);
 
@@ -207,11 +224,28 @@ router.post('/obtenerMenuItems', async (req, res) => {
 
 // ROLES
 
-router.get('/obtenerRoles', async (req, res) => {
+router.get("/obtenerRoles", authenticateToken, async (req, res) => {
+    const resultado = await obtenerRolesService();
+    responseTypeRoute(resultado, res);
+});
 
-    const resultado = await buscarRolesService();
+router.get("/obtenerRolesConMenus", authenticateToken, async (req, res) => {
+    const resultado = await obtenerRolesConMenusService();
+    responseTypeRoute(resultado, res);
+});
 
-    responseTypeRoute(resultado, res)
-})
+router.post("/crearRol", authenticateToken, async (req, res) => {
+    // req.body debe contener: { nombreRol: string, menus: [{id_menu, submenus: [id_sub_menu]}] }
+    const resultado = await crearRolService(req.body);
+    responseTypeRoute(resultado, res);
+});
+
+router.put("/actualizarRol", authenticateToken, async (req, res) => {
+    // req.body debe contener: { idRol, nombreRol, menus: [{id_menu, submenus: [id_sub_menu]}] }
+    const resultado = await actualizarRolService(req.body);
+    responseTypeRoute(resultado, res);
+});
+
+
 
 export default app

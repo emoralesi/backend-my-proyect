@@ -50,7 +50,7 @@ export const buscarTodoCategoriasService = async () => {
 
 export const agregarCategoriaService = async (req) => {
 
-    const conexion = await getClient(); // Se obtiene una nueva instancia del cliente
+    const conexion = await getClient();
 
     try {
         await conectar(conexion);

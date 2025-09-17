@@ -29,6 +29,8 @@ export const buscarFiltroCategoriaService = async () => {
 }
 
 export const AregarCategoriaAndFiltroService = async (body) => {
+    console.log("body", body);
+    
 
     const conexion = await getClient(); // Se obtiene una nueva instancia del cliente
 
@@ -44,7 +46,7 @@ export const AregarCategoriaAndFiltroService = async (body) => {
 
         await conexion.query('BEGIN'); // Inicia la transacción
 
-        if (body.isNewC) {
+        if (body.isNewCategoria) {
             const result = await agregarCategoria(conexion, body.nombreCategoria);
             idCategoria = result.rows[0].id_categoria
 
@@ -55,7 +57,7 @@ export const AregarCategoriaAndFiltroService = async (body) => {
             idSubSubCategoria = result3.rows[0].id_sub_sub_categoria
         }
 
-        if ((body.isNewSC) && !(body.isNewC)) {
+        if ((body.isNewSubCategoria) && !(body.isNewCategoria)) {
 
             const result = await agregarSubCategoria(conexion, body.nombreSubCategoria, body.categoria)
             idSubCategoria = result.rows[0].id_sub_categoria
@@ -64,7 +66,7 @@ export const AregarCategoriaAndFiltroService = async (body) => {
             idSubSubCategoria = result2.rows[0].id_sub_sub_categoria
         }
 
-        if (!body.isNewSC) {
+        if (!body.isNewSubCategoria) {
 
             const result = await agregarSubSubCategoria(conexion, body.nombreSubSubCategoria, body.subCategoria)
             idSubSubCategoria = result.rows[0].id_sub_sub_categoria
@@ -84,8 +86,6 @@ export const AregarCategoriaAndFiltroService = async (body) => {
         }
 
         await conexion.query('COMMIT'); // Confirma la transacción
-
-        console.log('Inserciones realizadas correctamente')
 
         let resultado = {
             "status": "ok",

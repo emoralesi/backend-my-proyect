@@ -45,7 +45,6 @@ export const agregarCategoria = async (conexion, nombre) => {
 
         let results = await conexion.query(sql)
 
-        console.log("mi resultado de categoria", results);
         return responseTypeDAO(results)
 
     } catch (error) {

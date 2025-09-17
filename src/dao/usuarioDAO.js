@@ -21,6 +21,42 @@ export const registrarUsuario = async (conexion, req) => {
     }
 }
 
+export const actualizarUsuario = async (conexion, req) => {
+    try {
+
+        const sql = {
+            text: 'update usuario set nombre_usuario = $1, id_roles = $2 where id_usuario = $3;',
+            values: [req.nombre_usuario, req.role, req.id_usuario],
+        }
+
+        const results = await conexion.query(sql)
+
+        return responseTypeDAO(results)
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+export const actualizarPasswordUsuario = async (conexion, req) => {
+    try {
+        const hashedPassword = await bcrypt.hash(req.newPassword, 10);
+        const sql = {
+            text: 'update usuario set password_usuario = $1 where id_usuario = $2;',
+            values: [hashedPassword, req.id_usuario],
+        }
+
+        const results = await conexion.query(sql)
+
+        return responseTypeDAO(results)
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 export const ConsultarUsuario = async (conexion, req) => {
 
     try {
@@ -55,7 +91,7 @@ export const ConsultarUsuarioActivo = async (conexion, req) => {
 
 export const obtenerUsuarios = async (conexion) => {
     try {
-        const sql = `select * from usuario u inner join roles r on (u.id_roles = r.id_roles)`;
+        const sql = `select u.id_usuario ,u.nombre_usuario ,u.id_roles ,u.activo ,r.id_roles ,r.nombre_rol from usuario u inner join roles r on (u.id_roles = r.id_roles)`;
 
         const results = await conexion.query(sql)
 
