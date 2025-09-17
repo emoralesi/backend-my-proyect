@@ -1,9 +1,7 @@
 import pkg from 'pg';
-import dotenv from 'dotenv';
 const { Client } = pkg;
 
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
-dotenv.config({ path: envFile });
 
 const config = {
   user: process.env.DB_USER,
@@ -11,6 +9,9 @@ const config = {
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: Number(process.env.DB_PORT),
+  ssl: {
+    rejectUnauthorized: false, // Equivale a sslmode=require
+  },
 };
 
 export function getClient() {

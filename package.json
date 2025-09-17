@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "dotenv --env-file .env.production node index.js",
-    "dev": "dotenv --env-file .env.development node index.js",
+    "start": "node --env-file .env.production index.js",
+    "dev": "node --env-file .env.development index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,12 +14,8 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.1",
     "pg": "^8.11.1"
-  },
-  "devDependencies": {
-    "dotenv-cli": "^10.0.0"
   }
 }
